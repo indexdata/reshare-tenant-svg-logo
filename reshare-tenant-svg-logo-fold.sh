@@ -10,7 +10,7 @@
 
 function show_usage {
   cat << EOU
-Usage: ${0##*/} [-ht:c:i:p:w:]
+Usage: ${0##*/} [-ht:c:i:p:w:d:]
 Generate a ReShare tenant logo as SVG.
 
 There are potentially 4 lines of centered text.
@@ -29,6 +29,8 @@ Optional:
        Default is reshare-grey, else black, red, etc.
   -w   Width at which to fold the text words into lines.
        Default and maximum 40 characters.
+  -d   <directory> The data directory to store the logo.
+       Default is current directory.
 EOU
 }
 max_length=120
@@ -36,9 +38,10 @@ max_length=120
 # Defaults:
 width=40
 text_color="rgb(90,80,120,100%)"  # reshare-grey
+data_dir="."
 
 script_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P)
-while getopts :ht:c:i:p:w: opt; do
+while getopts :ht:c:i:p:w:d: opt; do
   case $opt in
     h)
       show_usage
@@ -58,6 +61,9 @@ while getopts :ht:c:i:p:w: opt; do
       ;;
     w)
       width=$OPTARG
+      ;;
+    d)
+      data_dir=$OPTARG
       ;;
     :)
       echo "ERROR: Option -$OPTARG requires an argument." >&2
@@ -88,6 +94,10 @@ if [ -z "${code}" ]; then
   echo "ERROR: Missing required option -i ISIL or NUC code." >&2
   config_okay=false
 fi
+if [ ! -d "${data_dir}" ]; then
+  echo "ERROR: Specified data directory -d '${data_dir}' does not exist." >&2
+  config_okay=false
+fi
 if [ -n "${text}" ] && [ ${#text} -gt $max_length ]; then
   echo "WARNING: The option -t text length (${#text}) must not be greater than $max_length. Truncated." >&2
 fi
@@ -104,7 +114,7 @@ if [ "${consortium}" == "trove" ]; then
 else
   logo_fn="${script_dir}/reshare-tenant-svg-logo.svg"
 fi
-output_fn=$(echo "${consortium}-${code,,}.svg" | sed "s/://g")
+output_fn=$(echo "${data_dir}/${consortium}-${code,,}.svg" | sed "s/://g")
 
 readarray -t lines < <(echo "${text}" | fold -s -w "$width" | sed 's/[[:space:]]$//g')
 # declare -p lines >&2
