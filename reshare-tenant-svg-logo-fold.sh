@@ -98,6 +98,9 @@ if [ ! -d "${data_dir}" ]; then
   echo "ERROR: Specified data directory -d '${data_dir}' does not exist." >&2
   config_okay=false
 fi
+if [ -n "${text}" ]; then
+  text=$(echo "${text}" | sed 's|&|and|g')
+fi
 if [ -n "${text}" ] && [ ${#text} -gt $max_length ]; then
   echo "WARNING: The option -t text length (${#text}) must not be greater than $max_length. Truncated." >&2
 fi

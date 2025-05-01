@@ -97,6 +97,11 @@ if [ -z "${text_1}" ]; then
   echo "ERROR: Missing required option -1 text (first line)." >&2
   config_okay=false
 fi
+text_1=$(echo "${text_1}" | sed 's|&|and|g')
+text_2=$(echo "${text_2}" | sed 's|&|and|g')
+text_3=$(echo "${text_3}" | sed 's|&|and|g')
+text_4=$(echo "${text_4}" | sed 's|&|and|g')
+text_5=$(echo "${text_5}" | sed 's|&|and|g')
 if [ "${#text_1}" -gt ${max_width} ]; then
   echo "ERROR: The -1 text (first line) must be less than ${max_width} characters." >&2
   config_okay=false
